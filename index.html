@@ -594,7 +594,7 @@ const DEF = [
 // Datos pre-cargados desde el Excel (Semana 1 — Marzo)
 const PRELOAD = {
   monitors: DEF,
-  weeks: [{id:'w_sem1', label:'Semana 1 — Marzo'}],
+  weeks: [{id:'w_sem1', label:'Semana 1 — Marzo'},{id:'w_sem2', label:'Semana 2 — Marzo'}],
   scores: {
     "m_e1_liliana__w_sem1":   {meta_em:0.9,meta_rhl:0.0101,meta_owd:1.0,meta_ot:0.9665,meta_ep:0.9,meta_sp:1.0, em:89,   rhl:1.07,  owd:94.44, ot:95.6,  ep:33.33, sp:50,   sc_em:8.9,  sc_rhl:0.21, sc_owd:23.61, sc_ot:14.34, sc_ep:5.0,  sc_sp:7.5,  total:59.56},
     "m_e1_michael__w_sem1":   {meta_em:0.9,meta_rhl:0.0101,meta_owd:1.0,meta_ot:0.9665,meta_ep:0.9,meta_sp:1.0, em:89,   rhl:1.07,  owd:0,     ot:95.6,  ep:33.33, sp:100,  sc_em:8.9,  sc_rhl:0.21, sc_owd:0,     sc_ot:14.34, sc_ep:5.0,  sc_sp:15.0, total:43.45},
@@ -618,6 +618,29 @@ const PRELOAD = {
     "m_e10_kevin__w_sem1":    {meta_em:0.9,meta_rhl:0.018, meta_owd:1.0,meta_ot:0.99,  meta_ep:0.9,meta_sp:1.0, em:88,   rhl:1.49,  owd:72.22, ot:97.2,  ep:32.71, sp:50,   sc_em:8.8,  sc_rhl:0.3,  sc_owd:18.05, sc_ot:14.58, sc_ep:4.91, sc_sp:7.5,  total:54.14},
     "m_e11_andy__w_sem1":     {meta_em:0.9,meta_rhl:null,  meta_owd:1.0,meta_ot:null,  meta_ep:0.9,meta_sp:1.0, em:null, rhl:null,  owd:null,  ot:null,  ep:null,  sp:null, sc_em:null, sc_rhl:null, sc_owd:null,  sc_ot:null,  sc_ep:null, sc_sp:null, total:null},
     "m_e11_jazmin__w_sem1":   {meta_em:0.9,meta_rhl:null,  meta_owd:1.0,meta_ot:null,  meta_ep:0.9,meta_sp:1.0, em:null, rhl:null,  owd:null,  ot:null,  ep:null,  sp:null, sc_em:null, sc_rhl:null, sc_owd:null,  sc_ot:null,  sc_ep:null, sc_sp:null, total:null},
+    // ── Semana 2 — Marzo ──────────────────────────────────────────────────────
+    "m_e1_liliana__w_sem2":   {meta_em:0.9,meta_rhl:0.0101,meta_owd:1.0,meta_ot:0.9665,meta_ep:0.9,meta_sp:1.0, em:97,   rhl:17.235,owd:92.86, ot:95.6,  ep:26.83, sp:50,   sc_em:9.7,  sc_rhl:3.447,  sc_owd:23.215, sc_ot:14.34, sc_ep:4.0245, sc_sp:7.5,  total:62.23},
+    "m_e1_michael__w_sem2":   {meta_em:0.9,meta_rhl:0.0101,meta_owd:1.0,meta_ot:0.9665,meta_ep:0.9,meta_sp:1.0, em:61,   rhl:26.579,owd:0,     ot:95.6,  ep:18.34, sp:100,  sc_em:6.1,  sc_rhl:5.3158, sc_owd:0,      sc_ot:14.34, sc_ep:2.751,  sc_sp:15.0, total:43.51},
+    "m_e2_tifanny__w_sem2":   {meta_em:0.9,meta_rhl:0.0182,meta_owd:1.0,meta_ot:0.9533,meta_ep:0.9,meta_sp:1.0, em:61,   rhl:47.895,owd:71.43, ot:94.13, ep:25.21, sp:100,  sc_em:6.1,  sc_rhl:9.579,  sc_owd:17.8575,sc_ot:14.1195,sc_ep:3.7815, sc_sp:15.0, total:66.44},
+    "m_e2_paul__w_sem2":      {meta_em:0.9,meta_rhl:0.0182,meta_owd:1.0,meta_ot:0.9533,meta_ep:0.9,meta_sp:1.0, em:97,   rhl:31.058,owd:83.33, ot:94.13, ep:24.17, sp:100,  sc_em:9.7,  sc_rhl:6.2116, sc_owd:20.8325,sc_ot:14.1195,sc_ep:3.6255, sc_sp:15.0, total:69.49},
+    "m_e3_leonardo__w_sem2":  {meta_em:0.9,meta_rhl:0.0135,meta_owd:1.0,meta_ot:0.999, meta_ep:0.9,meta_sp:1.0, em:61,   rhl:98.54, owd:92.86, ot:93.1,  ep:58.42, sp:50,   sc_em:6.1,  sc_rhl:19.708, sc_owd:23.215, sc_ot:13.965, sc_ep:8.763,  sc_sp:7.5,  total:79.25},
+    "m_e3_melissa__w_sem2":   {meta_em:0.9,meta_rhl:0.0135,meta_owd:1.0,meta_ot:0.999, meta_ep:0.9,meta_sp:1.0, em:61,   rhl:98.54, owd:0,     ot:93.1,  ep:27.34, sp:50,   sc_em:6.1,  sc_rhl:19.708, sc_owd:0,      sc_ot:13.965, sc_ep:4.101,  sc_sp:7.5,  total:51.37},
+    "m_e4_leonor__w_sem2":    {meta_em:0.9,meta_rhl:0.0136,meta_owd:1.0,meta_ot:0.9829,meta_ep:0.9,meta_sp:1.0, em:91,   rhl:70.833,owd:92.86, ot:96.55, ep:41,    sp:50,   sc_em:9.1,  sc_rhl:14.1666,sc_owd:23.215, sc_ot:14.4825,sc_ep:6.15,   sc_sp:7.5,  total:74.61},
+    "m_e4_ana__w_sem2":       {meta_em:0.9,meta_rhl:0.0136,meta_owd:1.0,meta_ot:0.9829,meta_ep:0.9,meta_sp:1.0, em:91,   rhl:70.833,owd:83.33, ot:96.55, ep:33.33, sp:50,   sc_em:9.1,  sc_rhl:14.1666,sc_owd:20.8325,sc_ot:14.4825,sc_ep:4.9995, sc_sp:7.5,  total:71.08},
+    "m_e5_nicol__w_sem2":     {meta_em:0.9,meta_rhl:0.0096,meta_owd:1.0,meta_ot:0.9845,meta_ep:0.9,meta_sp:1.0, em:99,   rhl:67.606,owd:88.89, ot:97.15, ep:19.4,  sp:100,  sc_em:9.9,  sc_rhl:13.5212,sc_owd:22.2225,sc_ot:14.5725,sc_ep:2.91,   sc_sp:15.0, total:78.13},
+    "m_e5_noelia__w_sem2":    {meta_em:0.9,meta_rhl:0.0096,meta_owd:1.0,meta_ot:0.9845,meta_ep:0.9,meta_sp:1.0, em:99,   rhl:67.606,owd:0,     ot:97.15, ep:null,  sp:100,  sc_em:9.9,  sc_rhl:13.5212,sc_owd:0,      sc_ot:14.5725,sc_ep:null,   sc_sp:15.0, total:null},
+    "m_e6_keren__w_sem2":     {meta_em:0.9,meta_rhl:0.005, meta_owd:1.0,meta_ot:0.9679,meta_ep:0.9,meta_sp:1.0, em:73,   rhl:37.594,owd:92.86, ot:98.65, ep:25,    sp:100,  sc_em:7.3,  sc_rhl:7.5188, sc_owd:23.215, sc_ot:14.7975,sc_ep:3.75,   sc_sp:15.0, total:71.58},
+    "m_e6_estefania__w_sem2": {meta_em:0.9,meta_rhl:0.005, meta_owd:1.0,meta_ot:0.9679,meta_ep:0.9,meta_sp:1.0, em:73,   rhl:37.594,owd:94.44, ot:98.65, ep:35,    sp:50,   sc_em:7.3,  sc_rhl:7.5188, sc_owd:23.61,  sc_ot:14.7975,sc_ep:5.25,   sc_sp:7.5,  total:65.98},
+    "m_e9_nancy__w_sem2":     {meta_em:0.9,meta_rhl:0.0079,meta_owd:1.0,meta_ot:0.9121,meta_ep:0.9,meta_sp:1.0, em:81,   rhl:66.387,owd:100,   ot:97.7,  ep:37.5,  sp:50,   sc_em:8.1,  sc_rhl:13.2774,sc_owd:25.0,   sc_ot:14.655, sc_ep:5.625,  sc_sp:7.5,  total:74.16},
+    "m_e9_alexis__w_sem2":    {meta_em:0.9,meta_rhl:0.0079,meta_owd:1.0,meta_ot:0.9121,meta_ep:0.9,meta_sp:1.0, em:81,   rhl:66.387,owd:88.89, ot:97.7,  ep:28.33, sp:100,  sc_em:8.1,  sc_rhl:13.2774,sc_owd:22.2225,sc_ot:14.655, sc_ep:4.2495, sc_sp:15.0, total:77.5},
+    "m_e7_gladys__w_sem2":    {meta_em:0.9,meta_rhl:0.0098,meta_owd:1.0,meta_ot:0.9695,meta_ep:0.9,meta_sp:1.0, em:74,   rhl:79.675,owd:78.57, ot:96.57, ep:30,    sp:50,   sc_em:7.4,  sc_rhl:15.935, sc_owd:19.6425,sc_ot:14.4855,sc_ep:4.5,    sc_sp:7.5,  total:69.46},
+    "m_e7_jorge__w_sem2":     {meta_em:0.9,meta_rhl:0.0098,meta_owd:1.0,meta_ot:0.9695,meta_ep:0.9,meta_sp:1.0, em:74,   rhl:79.675,owd:88.89, ot:96.57, ep:40,    sp:50,   sc_em:7.4,  sc_rhl:15.935, sc_owd:22.2225,sc_ot:14.4855,sc_ep:6.0,    sc_sp:7.5,  total:73.54},
+    "m_e8_gina__w_sem2":      {meta_em:0.9,meta_rhl:0.0037,meta_owd:1.0,meta_ot:0.9728,meta_ep:0.9,meta_sp:1.0, em:100,  rhl:100,   owd:85.71, ot:98.45, ep:35,    sp:50,   sc_em:10.0, sc_rhl:20.0,   sc_owd:21.4275,sc_ot:14.7675,sc_ep:5.25,   sc_sp:7.5,  total:78.94},
+    "m_e8_karen__w_sem2":     {meta_em:0.9,meta_rhl:0.0037,meta_owd:1.0,meta_ot:0.9728,meta_ep:0.9,meta_sp:1.0, em:100,  rhl:100,   owd:88.89, ot:98.45, ep:23.24, sp:100,  sc_em:10.0, sc_rhl:20.0,   sc_owd:22.2225,sc_ot:14.7675,sc_ep:3.486,  sc_sp:15.0, total:85.48},
+    "m_e10_niurka__w_sem2":   {meta_em:0.9,meta_rhl:0.018, meta_owd:1.0,meta_ot:0.99,  meta_ep:0.9,meta_sp:1.0, em:81,   rhl:90.909,owd:78.57, ot:97.2,  ep:48.33, sp:100,  sc_em:8.1,  sc_rhl:18.1818,sc_owd:19.6425,sc_ot:14.58,  sc_ep:7.2495, sc_sp:15.0, total:82.75},
+    "m_e10_kevin__w_sem2":    {meta_em:0.9,meta_rhl:0.018, meta_owd:1.0,meta_ot:0.99,  meta_ep:0.9,meta_sp:1.0, em:81,   rhl:90.909,owd:94.44, ot:97.2,  ep:47.22, sp:50,   sc_em:8.1,  sc_rhl:18.1818,sc_owd:23.61,  sc_ot:14.58,  sc_ep:7.083,  sc_sp:7.5,  total:79.05},
+    "m_e11_andy__w_sem2":     {meta_em:0.9,meta_rhl:null,  meta_owd:1.0,meta_ot:null,  meta_ep:0.9,meta_sp:1.0, em:null, rhl:null,  owd:null,  ot:null,  ep:null,  sp:null, sc_em:null, sc_rhl:null, sc_owd:null,  sc_ot:null,  sc_ep:null, sc_sp:null, total:null},
+    "m_e11_jazmin__w_sem2":   {meta_em:0.9,meta_rhl:null,  meta_owd:1.0,meta_ot:null,  meta_ep:0.9,meta_sp:1.0, em:null, rhl:null,  owd:null,  ot:null,  ep:null,  sp:null, sc_em:null, sc_rhl:null, sc_owd:null,  sc_ot:null,  sc_ep:null, sc_sp:null, total:null},
   }
 };
 
