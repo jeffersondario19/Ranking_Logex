@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIGA DEC — Dashboard Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0c10;--surface:#111318;--card:#161b22;--border:#21262d;--accent:#f0a500;--red:#f85149;--blue:#58a6ff;--purple:#bc8cff;--text:#e6edf3;--muted:#8b949e;--alto:#3ecf8e;--medio:#f0a500;--bajo:#f85149;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;font-size:13px;min-height:100vh;}
+.header{background:linear-gradient(135deg,#0d1117,#161b22);border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo-box{background:var(--accent);color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:17px;padding:6px 12px;border-radius:6px;letter-spacing:2px;}
+.header-title{font-family:'Syne',sans-serif;font-weight:700;font-size:19px;margin-left:14px;}
+.header-sub{color:var(--muted);font-size:11px;margin-top:2px;margin-left:14px;}
+.badge-live{background:rgba(62,207,142,0.15);border:1px solid rgba(62,207,142,0.3);color:var(--alto);padding:4px 12px;border-radius:20px;font-size:11px;}
+.tabs{display:flex;gap:4px;padding:14px 32px 0;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto;}
+.tab{padding:10px 20px;border-radius:8px 8px 0 0;cursor:pointer;font-family:'Syne',sans-serif;font-weight:600;font-size:11px;color:var(--muted);border:1px solid transparent;border-bottom:none;transition:all 0.2s;white-space:nowrap;}
+.tab:hover{color:var(--text);background:var(--card);}
+.tab.active{color:var(--accent);background:var(--card);border-color:var(--border);border-bottom-color:var(--card);position:relative;bottom:-1px;}
+.content{padding:26px 32px;}
+.panel{display:none;}.panel.active{display:block;}
+.filters{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap;align-items:center;}
+.filter-label{color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;}
+select{background:var(--card);border:1px solid var(--border);color:var(--text);padding:7px 13px;border-radius:8px;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;outline:none;transition:border-color 0.2s;}
+select:hover,select:focus{border-color:var(--accent);}
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;}
+.kpi-strip-5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:26px;}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.kpi-card.gold::before{background:var(--accent);}.kpi-card.green::before{background:var(--alto);}.kpi-card.red::before{background:var(--red);}.kpi-card.blue::before{background:var(--blue);}.kpi-card.purple::before{background:var(--purple);}
+.kpi-label{color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.kpi-value{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;line-height:1;margin-bottom:4px;}
+.kpi-sub{color:var(--muted);font-size:10px;}
+.kpi-card.gold .kpi-value{color:var(--accent);}.kpi-card.green .kpi-value{color:var(--alto);}.kpi-card.red .kpi-value{color:var(--red);}.kpi-card.blue .kpi-value{color:var(--blue);}.kpi-card.purple .kpi-value{color:var(--purple);}
+.section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.section-title::before{content:'';display:inline-block;width:3px;height:15px;background:var(--accent);border-radius:2px;}
+.section-note{color:var(--muted);font-size:11px;margin-left:4px;font-weight:400;}
+.rank-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:26px;}
+.tbl-scroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:rgba(240,165,0,0.06);border-bottom:1px solid var(--border);}
+th{padding:11px 14px;text-align:left;font-family:'Syne',sans-serif;font-weight:600;font-size:10px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;}
+td{padding:10px 14px;border-bottom:1px solid rgba(33,38,45,0.6);font-size:12px;white-space:nowrap;}
+tr:last-child td{border-bottom:none;}tr:hover td{background:rgba(255,255,255,0.02);}
+.pos{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;width:32px;text-align:center;display:inline-block;}
+.pos.p1{color:var(--accent);}.pos.p2{color:#c0c0c0;}.pos.p3{color:#cd7f32;}.pos.pn{color:var(--muted);}
+.move{display:inline-flex;align-items:center;gap:3px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;}
+.move.up{background:rgba(62,207,142,0.15);color:var(--alto);}.move.down{background:rgba(248,81,73,0.15);color:var(--red);}.move.same{background:rgba(139,148,158,0.15);color:var(--muted);}.move.new{background:rgba(88,166,255,0.15);color:var(--blue);}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600;font-family:'Syne',sans-serif;}
+.badge-alto{background:rgba(62,207,142,0.15);color:var(--alto);border:1px solid rgba(62,207,142,0.3);}
+.badge-medio{background:rgba(240,165,0,0.15);color:var(--medio);border:1px solid rgba(240,165,0,0.3);}
+.badge-bajo{background:rgba(248,81,73,0.15);color:var(--bajo);border:1px solid rgba(248,81,73,0.3);}
+.sbar-wrap{display:flex;align-items:center;gap:8px;}
+.sbar{width:70px;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.sbar-fill{height:100%;border-radius:3px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:26px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:26px;}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.chart-card canvas{max-height:280px;}
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:16px;margin-bottom:28px;padding:0 20px;}
+.podium-item{text-align:center;flex:1;max-width:200px;}
+.podium-block{border-radius:10px 10px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:14px 12px 18px;}
+.podium-block.p1{background:linear-gradient(180deg,rgba(240,165,0,.25),rgba(240,165,0,.06));border:1px solid rgba(240,165,0,.3);height:160px;}
+.podium-block.p2{background:linear-gradient(180deg,rgba(192,192,192,.2),rgba(192,192,192,.04));border:1px solid rgba(192,192,192,.2);height:120px;}
+.podium-block.p3{background:linear-gradient(180deg,rgba(205,127,50,.2),rgba(205,127,50,.04));border:1px solid rgba(205,127,50,.2);height:100px;}
+.podium-num{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;line-height:1;}
+.podium-num.p1{color:var(--accent);}.podium-num.p2{color:#c0c0c0;}.podium-num.p3{color:#cd7f32;}
+.podium-score{font-size:18px;font-family:'Syne',sans-serif;font-weight:800;margin-top:6px;}
+.podium-score.p1{color:var(--accent);}.podium-score.p2{color:#c0c0c0;}.podium-score.p3{color:#cd7f32;}
+.pills{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.pill{padding:5px 14px;border-radius:20px;background:var(--card);border:1px solid var(--border);cursor:pointer;font-family:'Syne',sans-serif;font-size:11px;font-weight:600;color:var(--muted);transition:all .2s;}
+.pill:hover,.pill.active{background:rgba(240,165,0,.15);border-color:rgba(240,165,0,.4);color:var(--accent);}
+.spark{display:inline-flex;align-items:flex-end;gap:3px;height:24px;}
+.spark-bar{width:8px;border-radius:2px 2px 0 0;}
+/* HEATMAP */
+.hm-grid{display:grid;gap:4px;}
+.hm-header-cell{padding:8px 4px;text-align:center;font-size:10px;font-family:'Syne',sans-serif;font-weight:600;color:var(--accent);letter-spacing:.5px;}
+.hm-name-cell{text-align:left;padding:8px 10px;font-size:11px;color:var(--text);display:flex;align-items:center;}
+.hm-cell{padding:8px 4px;text-align:center;border-radius:6px;font-size:11px;font-weight:600;}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:900px){.kpi-strip,.kpi-strip-5{grid-template-columns:repeat(2,1fr);}.grid-2,.grid-3{grid-template-columns:1fr;}.content{padding:14px;}.tabs{padding:10px 14px 0;}}
+</style>
+</head>
+<body>
+<header class="header">
+  <div style="display:flex;align-items:center;">
+    <div class="logo-box">DEC</div>
+    <div><div class="header-title">Dashboard Control</div><div class="header-sub">LIGA DEC · Marzo 2025 · 3 Semanas · 21 Monitoristas</div></div>
+  </div>
+  <div class="badge-live">● ACTIVO</div>
+</header>
+
+<div class="tabs">
+  <div class="tab active"  onclick="showTab('resumen',this)">Resumen General</div>
+  <div class="tab" onclick="showTab('ranking-sem',this)">Ranking Semanal</div>
+  <div class="tab" onclick="showTab('ranking-mes',this)">Ranking Mensual</div>
+  <div class="tab" onclick="showTab('evolucion',this)">Evolución Monitorista</div>
+  <div class="tab" onclick="showTab('comparativo',this)">Comparativo Semanas</div>
+  <div class="tab" onclick="showTab('heatmap',this)">Heatmap KPIs</div>
+</div>
+
+<div class="content">
+
+<!-- ===== RESUMEN GENERAL ===== -->
+<div id="panel-resumen" class="panel active">
+  <div class="filters">
+    <span class="filter-label">Filtrar:</span>
+    <select id="f-sem-res" onchange="renderResumen()">
+      <option value="all">Todas las semanas</option>
+      <option value="Semana 1">Semana 1</option><option value="Semana 2">Semana 2</option><option value="Semana 3">Semana 3</option>
+    </select>
+    <select id="f-liga-res" onchange="renderResumen()">
+      <option value="all">Todas las ligas</option>
+      <option value="Liga 1">Liga 1</option><option value="Liga 2">Liga 2</option><option value="Liga 3">Liga 3</option>
+    </select>
+  </div>
+  <div class="kpi-strip" id="kpi-res"></div>
+  <div class="grid-2">
+    <div class="chart-card"><div class="section-title">Score Promedio por Semana</div><canvas id="ch-res-sem"></canvas></div>
+    <div class="chart-card"><div class="section-title">Distribución de Niveles</div><canvas id="ch-res-niv"></canvas></div>
+  </div>
+  <div class="grid-3">
+    <div class="chart-card"><div class="section-title">Score por Liga</div><canvas id="ch-res-liga"></canvas></div>
+    <div class="chart-card"><div class="section-title">KPIs Promedio</div><canvas id="ch-res-kpi"></canvas></div>
+    <div class="chart-card"><div class="section-title">Score por Turno</div><canvas id="ch-res-turno"></canvas></div>
+  </div>
+</div>
+
+<!-- ===== RANKING SEMANAL ===== -->
+<div id="panel-ranking-sem" class="panel">
+  <div class="filters">
+    <span class="filter-label">Semana:</span>
+    <div class="pills" id="pills-sem" style="margin-bottom:0"></div>
+    <select id="f-liga-sem" onchange="renderRankingSemanal()">
+      <option value="all">Todas las ligas</option>
+      <option value="Liga 1">Liga 1</option><option value="Liga 2">Liga 2</option><option value="Liga 3">Liga 3</option>
+    </select>
+  </div>
+  <div id="podium-sem"></div>
+  <div class="kpi-strip-5" id="kpi-sem"></div>
+  <div class="section-title">Ranking Completo — <span id="sem-lbl" style="color:var(--accent)">Semana 1</span><span class="section-note">↑↓ cambio vs semana anterior</span></div>
+  <div class="rank-wrap"><div class="tbl-scroll">
+    <table><thead><tr><th>#</th><th>Mov.</th><th>Monitorista</th><th>Estación</th><th>Liga</th><th>Turno</th><th>Ef.Mod</th><th>Rechazo HL</th><th>OWD %</th><th>On Time %</th><th>Ef.Prev %</th><th>5S %</th><th>Score</th><th>Nivel</th></tr></thead>
+    <tbody id="body-sem"></tbody></table>
+  </div></div>
+  <div class="section-title">Evolución de Posiciones por Semana</div>
+  <div class="chart-card" style="margin-bottom:26px;"><canvas id="ch-pos-lines" style="max-height:360px;"></canvas></div>
+</div>
+
+<!-- ===== RANKING MENSUAL ===== -->
+<div id="panel-ranking-mes" class="panel">
+  <div class="filters">
+    <select id="f-liga-mes" onchange="renderRankingMensual()">
+      <option value="all">Todas las ligas</option>
+      <option value="Liga 1">Liga 1</option><option value="Liga 2">Liga 2</option><option value="Liga 3">Liga 3</option>
+    </select>
+  </div>
+  <div id="podium-mes"></div>
+  <div class="kpi-strip-5" id="kpi-mes"></div>
+  <div class="section-title">Ranking Mensual — Promedio Acumulado (S1–S3)</div>
+  <div class="rank-wrap"><div class="tbl-scroll">
+    <table><thead><tr><th>#</th><th>Monitorista</th><th>Estación</th><th>Liga</th><th>Turno</th><th>S1</th><th>S2</th><th>S3</th><th>Δ S1→S3</th><th>Prom. Mensual</th><th>Tendencia</th><th>Nivel</th></tr></thead>
+    <tbody id="body-mes"></tbody></table>
+  </div></div>
+  <div class="grid-2">
+    <div class="chart-card"><div class="section-title">Top 10 Score Mensual</div><canvas id="ch-mes-bar"></canvas></div>
+    <div class="chart-card"><div class="section-title">Distribución de Niveles por Semana</div><canvas id="ch-mes-niv"></canvas></div>
+  </div>
+</div>
+
+<!-- ===== EVOLUCIÓN MONITORISTA ===== -->
+<div id="panel-evolucion" class="panel">
+  <div class="filters">
+    <span class="filter-label">Monitorista:</span>
+    <select id="sel-mon" onchange="renderEvolucion()"></select>
+    <select id="f-liga-evo" onchange="populateMonSel()">
+      <option value="all">Todas las ligas</option>
+      <option value="Liga 1">Liga 1</option><option value="Liga 2">Liga 2</option><option value="Liga 3">Liga 3</option>
+    </select>
+  </div>
+  <div id="evo-detail"></div>
+</div>
+
+<!-- ===== COMPARATIVO ===== -->
+<div id="panel-comparativo" class="panel">
+  <div class="filters">
+    <select id="f-liga-comp" onchange="renderComparativo()">
+      <option value="all">Todas las ligas</option>
+      <option value="Liga 1">Liga 1</option><option value="Liga 2">Liga 2</option><option value="Liga 3">Liga 3</option>
+    </select>
+  </div>
+  <div class="kpi-strip-5" id="kpi-comp"></div>
+  <div class="section-title">Comparativo Score — Todos los Monitoristas</div>
+  <div class="rank-wrap"><div class="tbl-scroll">
+    <table><thead><tr><th>Monitorista</th><th>Estación</th><th>Liga</th><th>Semana 1</th><th>Semana 2</th><th>Semana 3</th><th>Δ S1→S2</th><th>Δ S2→S3</th><th>Δ Total</th><th>Prom.</th><th>Tendencia</th></tr></thead>
+    <tbody id="body-comp"></tbody></table>
+  </div></div>
+  <div class="section-title">Líneas de Evolución — Score por Semana</div>
+  <div class="chart-card" style="margin-bottom:26px;"><canvas id="ch-comp-lines" style="max-height:340px;"></canvas></div>
+</div>
+
+<!-- ===== HEATMAP ===== -->
+<div id="panel-heatmap" class="panel">
+  <div class="filters">
+    <select id="f-sem-hm" onchange="renderHeatmap()">
+      <option value="all">Todas las semanas</option>
+      <option value="Semana 1">Semana 1</option><option value="Semana 2">Semana 2</option><option value="Semana 3">Semana 3</option>
+    </select>
+    <select id="f-liga-hm" onchange="renderHeatmap()">
+      <option value="all">Todas las ligas</option>
+      <option value="Liga 1">Liga 1</option><option value="Liga 2">Liga 2</option><option value="Liga 3">Liga 3</option>
+    </select>
+  </div>
+  <div class="section-title">Mapa de Calor — KPIs por Monitorista</div>
+  <div class="chart-card" style="overflow-x:auto;">
+    <div id="hm-grid"></div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const DATA=[{"Semana":"Semana 1","Monitorista":"Liliana Mota","Estación":"E2","Liga":"Liga 2","Turno":"T1","Ef.Mod":89,"Rechazo HL":94.39,"OWD %":94.44,"On Time %":95.6,"Ef.Prev %":33.33,"5S Punt %":50,"Score Total":78.23,"Nivel":"Medio"},{"Semana":"Semana 1","Monitorista":"Michael Preciado","Estación":"E1","Liga":"Liga 2","Turno":"T2","Ef.Mod":89,"Rechazo HL":94.39,"OWD %":0.0,"On Time %":95.6,"Ef.Prev %":33.33,"5S Punt %":100,"Score Total":62.12,"Nivel":"Medio"},{"Semana":"Semana 1","Monitorista":"Tifanny Chavez","Estación":"E1","Liga":"Liga 1","Turno":"T1","Ef.Mod":75,"Rechazo HL":73.68,"OWD %":94.13,"On Time %":94.13,"Ef.Prev %":24.56,"5S Punt %":100,"Score Total":78.57,"Nivel":"Medio"},{"Semana":"Semana 1","Monitorista":"Paul Barco","Estación":"E2","Liga":"Liga 1","Turno":"T2","Ef.Mod":75,"Rechazo HL":73.68,"OWD %":57.14,"On Time %":94.13,"Ef.Prev %":24.56,"5S Punt %":100,"Score Total":69.32,"Nivel":"Medio"},{"Semana":"Semana 1","Monitorista":"Leonardo Lamm","Estación":"E3","Liga":"Liga 1","Turno":"T1","Ef.Mod":75,"Rechazo HL":42.45,"OWD %":88.89,"On Time %":93.1,"Ef.Prev %":26.6,"5S Punt %":50,"Score Total":63.67,"Nivel":"Medio"},{"Semana":"Semana 1","Monitorista":"Melissa Paredes","Estación":"E3","Liga":"Liga 1","Turno":"T2","Ef.Mod":75,"Rechazo HL":42.45,"OWD %":0.0,"On Time %":93.1,"Ef.Prev %":26.6,"5S Punt %":50,"Score Total":41.45,"Nivel":"Bajo"},{"Semana":"Semana 1","Monitorista":"Leonor Flores","Estación":"E4","Liga":"Liga 2","Turno":"T1","Ef.Mod":71,"Rechazo HL":100.0,"OWD %":83.33,"On Time %":96.55,"Ef.Prev %":36.67,"5S Punt %":100,"Score Total":82.92,"Nivel":"Alto"},{"Semana":"Semana 1","Monitorista":"Ana Flores","Estación":"E4","Liga":"Liga 2","Turno":"T2","Ef.Mod":71,"Rechazo HL":100.0,"OWD %":71.43,"On Time %":96.55,"Ef.Prev %":36.67,"5S Punt %":50,"Score Total":72.44,"Nivel":"Medio"},{"Semana":"Semana 1","Monitorista":"Nicol Baez","Estación":"E5","Liga":"Liga 2","Turno":"T1","Ef.Mod":93,"Rechazo HL":100.0,"OWD %":88.89,"On Time %":97.15,"Ef.Prev %":29.24,"5S Punt %":50,"Score Total":77.98,"Nivel":"Medio"},{"Semana":"Semana 1","Monitorista":"Noelia Ojedis","Estación":"E5","Liga":"Liga 2","Turno":"T2","Ef.Mod":93,"Rechazo HL":100.0,"OWD %":0.0,"On Time %":97.15,"Ef.Prev %":29.24,"5S Punt %":0,"Score Total":48.26,"Nivel":"Bajo"},{"Semana":"Semana 1","Monitorista":"Keren Hallon","Estación":"E6","Liga":"Liga 3","Turno":"T1","Ef.Mod":83,"Rechazo HL":33.78,"OWD %":0.0,"On Time %":98.65,"Ef.Prev %":40.0,"5S Punt %":100,"Score Total":50.85,"Nivel":"Medio"},{"Semana":"Semana 1","Monitorista":"Estefania Perez","Estación":"E6","Liga":"Liga 3","Turno":"T2","Ef.Mod":83,"Rechazo HL":33.78,"OWD %":50.0,"On Time %":98.65,"Ef.Prev %":40.0,"5S Punt %":100,"Score Total":63.35,"Nivel":"Medio"},{"Semana":"Semana 1","Monitorista":"Nancy coronel","Estación":"E9","Liga":"Liga 1","Turno":"T1","Ef.Mod":100,"Rechazo HL":40.51,"OWD %":94.44,"On Time %":97.7,"Ef.Prev %":44.19,"5S Punt %":50,"Score Total":70.5,"Nivel":"Medio"},{"Semana":"Semana 1","Monitorista":"Alexis zuñiga","Estación":"E9","Liga":"Liga 1","Turno":"T2","Ef.Mod":100,"Rechazo HL":40.51,"OWD %":57.14,"On Time %":97.7,"Ef.Prev %":44.19,"5S Punt %":100,"Score Total":68.67,"Nivel":"Medio"},{"Semana":"Semana 1","Monitorista":"Gladys Ponce","Estación":"E7","Liga":"Liga 3","Turno":"T1","Ef.Mod":98,"Rechazo HL":100.0,"OWD %":92.86,"On Time %":96.57,"Ef.Prev %":30.1,"5S Punt %":100,"Score Total":87.02,"Nivel":"Alto"},{"Semana":"Semana 1","Monitorista":"Jorge Garzon","Estación":"E7","Liga":"Liga 3","Turno":"T2","Ef.Mod":98,"Rechazo HL":100.0,"OWD %":0.0,"On Time %":96.57,"Ef.Prev %":30.1,"5S Punt %":100,"Score Total":63.8,"Nivel":"Medio"},{"Semana":"Semana 1","Monitorista":"Gina Ramos","Estación":"E8","Liga":"Liga 3","Turno":"T1","Ef.Mod":100,"Rechazo HL":100.0,"OWD %":94.44,"On Time %":98.45,"Ef.Prev %":35.94,"5S Punt %":100,"Score Total":88.77,"Nivel":"Alto"},{"Semana":"Semana 1","Monitorista":"Karen Toledo","Estación":"E8","Liga":"Liga 3","Turno":"T2","Ef.Mod":100,"Rechazo HL":100.0,"OWD %":71.43,"On Time %":98.45,"Ef.Prev %":35.94,"5S Punt %":100,"Score Total":83.02,"Nivel":"Alto"},{"Semana":"Semana 1","Monitorista":"Niurka Chenche","Estación":"E10","Liga":"Liga 1","Turno":"T1","Ef.Mod":88,"Rechazo HL":100.0,"OWD %":77.78,"On Time %":97.2,"Ef.Prev %":32.71,"5S Punt %":100,"Score Total":82.73,"Nivel":"Alto"},{"Semana":"Semana 1","Monitorista":"Kevin Araujo","Estación":"E10","Liga":"Liga 1","Turno":"T2","Ef.Mod":88,"Rechazo HL":100.0,"OWD %":72.22,"On Time %":97.2,"Ef.Prev %":32.71,"5S Punt %":50,"Score Total":73.84,"Nivel":"Medio"},{"Semana":"Semana 1","Monitorista":"Paula Carriel","Estación":"E5","Liga":"Liga 2","Turno":"T2","Ef.Mod":93,"Rechazo HL":100.0,"OWD %":88.89,"On Time %":97.15,"Ef.Prev %":29.24,"5S Punt %":100,"Score Total":81.32,"Nivel":"Alto"},{"Semana":"Semana 2","Monitorista":"Liliana Mota","Estación":"E2","Liga":"Liga 2","Turno":"T1","Ef.Mod":97,"Rechazo HL":17.24,"OWD %":92.86,"On Time %":95.6,"Ef.Prev %":26.83,"5S Punt %":50,"Score Total":62.23,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Michael Preciado","Estación":"E1","Liga":"Liga 2","Turno":"T2","Ef.Mod":61,"Rechazo HL":26.58,"OWD %":0.0,"On Time %":95.6,"Ef.Prev %":18.34,"5S Punt %":100,"Score Total":43.51,"Nivel":"Bajo"},{"Semana":"Semana 2","Monitorista":"Tifanny Chavez","Estación":"E1","Liga":"Liga 1","Turno":"T1","Ef.Mod":61,"Rechazo HL":47.89,"OWD %":71.43,"On Time %":94.13,"Ef.Prev %":25.21,"5S Punt %":100,"Score Total":66.44,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Paul Barco","Estación":"E2","Liga":"Liga 1","Turno":"T2","Ef.Mod":97,"Rechazo HL":31.06,"OWD %":83.33,"On Time %":94.13,"Ef.Prev %":24.17,"5S Punt %":100,"Score Total":69.49,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Leonardo Lamm","Estación":"E3","Liga":"Liga 1","Turno":"T1","Ef.Mod":61,"Rechazo HL":98.54,"OWD %":92.86,"On Time %":93.1,"Ef.Prev %":58.42,"5S Punt %":50,"Score Total":79.25,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Melissa Paredes","Estación":"E3","Liga":"Liga 1","Turno":"T2","Ef.Mod":61,"Rechazo HL":98.54,"OWD %":0.0,"On Time %":93.1,"Ef.Prev %":27.34,"5S Punt %":50,"Score Total":51.37,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Leonor Flores","Estación":"E4","Liga":"Liga 2","Turno":"T1","Ef.Mod":91,"Rechazo HL":70.83,"OWD %":92.86,"On Time %":96.55,"Ef.Prev %":41.0,"5S Punt %":50,"Score Total":74.61,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Ana Flores","Estación":"E4","Liga":"Liga 2","Turno":"T2","Ef.Mod":91,"Rechazo HL":70.83,"OWD %":83.33,"On Time %":96.55,"Ef.Prev %":33.33,"5S Punt %":50,"Score Total":71.08,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Nicol Baez","Estación":"E5","Liga":"Liga 2","Turno":"T1","Ef.Mod":99,"Rechazo HL":67.61,"OWD %":88.89,"On Time %":97.15,"Ef.Prev %":19.4,"5S Punt %":100,"Score Total":78.13,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Paula Carriel","Estación":"E5","Liga":"Liga 2","Turno":"T2","Ef.Mod":99,"Rechazo HL":67.61,"OWD %":0.0,"On Time %":97.15,"Ef.Prev %":0.0,"5S Punt %":100,"Score Total":52.99,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Keren Hallon","Estación":"E6","Liga":"Liga 3","Turno":"T1","Ef.Mod":73,"Rechazo HL":37.59,"OWD %":92.86,"On Time %":98.65,"Ef.Prev %":25.0,"5S Punt %":100,"Score Total":71.58,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Estefania Perez","Estación":"E6","Liga":"Liga 3","Turno":"T2","Ef.Mod":73,"Rechazo HL":37.59,"OWD %":94.44,"On Time %":98.65,"Ef.Prev %":35.0,"5S Punt %":50,"Score Total":65.98,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Nancy coronel","Estación":"E9","Liga":"Liga 1","Turno":"T1","Ef.Mod":81,"Rechazo HL":66.39,"OWD %":100.0,"On Time %":97.7,"Ef.Prev %":37.5,"5S Punt %":50,"Score Total":74.16,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Alexis zuñiga","Estación":"E9","Liga":"Liga 1","Turno":"T2","Ef.Mod":81,"Rechazo HL":66.39,"OWD %":88.89,"On Time %":97.7,"Ef.Prev %":28.33,"5S Punt %":100,"Score Total":77.51,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Gladys Ponce","Estación":"E7","Liga":"Liga 3","Turno":"T1","Ef.Mod":74,"Rechazo HL":79.67,"OWD %":78.57,"On Time %":96.57,"Ef.Prev %":30.0,"5S Punt %":50,"Score Total":69.46,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Jorge Garzon","Estación":"E7","Liga":"Liga 3","Turno":"T2","Ef.Mod":74,"Rechazo HL":79.67,"OWD %":88.89,"On Time %":96.57,"Ef.Prev %":40.0,"5S Punt %":50,"Score Total":73.54,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Gina Ramos","Estación":"E8","Liga":"Liga 3","Turno":"T1","Ef.Mod":100,"Rechazo HL":100.0,"OWD %":85.71,"On Time %":98.45,"Ef.Prev %":35.0,"5S Punt %":50,"Score Total":78.95,"Nivel":"Medio"},{"Semana":"Semana 2","Monitorista":"Karen Toledo","Estación":"E8","Liga":"Liga 3","Turno":"T2","Ef.Mod":100,"Rechazo HL":100.0,"OWD %":88.89,"On Time %":98.45,"Ef.Prev %":23.24,"5S Punt %":100,"Score Total":85.48,"Nivel":"Alto"},{"Semana":"Semana 2","Monitorista":"Niurka Chenche","Estación":"E10","Liga":"Liga 1","Turno":"T1","Ef.Mod":81,"Rechazo HL":90.91,"OWD %":78.57,"On Time %":97.2,"Ef.Prev %":48.33,"5S Punt %":100,"Score Total":82.75,"Nivel":"Alto"},{"Semana":"Semana 2","Monitorista":"Kevin Araujo","Estación":"E10","Liga":"Liga 1","Turno":"T2","Ef.Mod":81,"Rechazo HL":90.91,"OWD %":94.44,"On Time %":97.2,"Ef.Prev %":47.22,"5S Punt %":50,"Score Total":79.06,"Nivel":"Medio"},{"Semana":"Semana 3","Monitorista":"Liliana Mota","Estación":"E2","Liga":"Liga 2","Turno":"T1","Ef.Mod":91,"Rechazo HL":15.24,"OWD %":94.44,"On Time %":93.0,"Ef.Prev %":27.3,"5S Punt %":50,"Score Total":61.3,"Nivel":"Medio"},{"Semana":"Semana 3","Monitorista":"Michael Preciado","Estación":"E1","Liga":"Liga 2","Turno":"T2","Ef.Mod":73,"Rechazo HL":82.08,"OWD %":64.29,"On Time %":93.0,"Ef.Prev %":34.34,"5S Punt %":100,"Score Total":73.89,"Nivel":"Medio"},{"Semana":"Semana 3","Monitorista":"Tifanny Chavez","Estación":"E1","Liga":"Liga 1","Turno":"T1","Ef.Mod":73,"Rechazo HL":82.08,"OWD %":88.89,"On Time %":91.1,"Ef.Prev %":30.0,"5S Punt %":100,"Score Total":79.1,"Nivel":"Medio"},{"Semana":"Semana 3","Monitorista":"Paul Barco","Estación":"E2","Liga":"Liga 1","Turno":"T2","Ef.Mod":91,"Rechazo HL":15.24,"OWD %":83.33,"On Time %":91.1,"Ef.Prev %":23.45,"5S Punt %":100,"Score Total":65.16,"Nivel":"Medio"},{"Semana":"Semana 3","Monitorista":"Leonardo Lamm","Estación":"E3","Liga":"Liga 1","Turno":"T1","Ef.Mod":98,"Rechazo HL":98.54,"OWD %":94.44,"On Time %":93.1,"Ef.Prev %":50.0,"5S Punt %":50,"Score Total":82.08,"Nivel":"Alto"},{"Semana":"Semana 3","Monitorista":"Melissa Paredes","Estación":"E3","Liga":"Liga 1","Turno":"T2","Ef.Mod":98,"Rechazo HL":98.54,"OWD %":92.86,"On Time %":93.1,"Ef.Prev %":27.08,"5S Punt %":50,"Score Total":78.25,"Nivel":"Medio"},{"Semana":"Semana 3","Monitorista":"Leonor Flores","Estación":"E4","Liga":"Liga 2","Turno":"T1","Ef.Mod":91,"Rechazo HL":79.83,"OWD %":94.44,"On Time %":95.55,"Ef.Prev %":33.68,"5S Punt %":50,"Score Total":75.56,"Nivel":"Medio"},{"Semana":"Semana 3","Monitorista":"Ana Flores","Estación":"E4","Liga":"Liga 2","Turno":"T2","Ef.Mod":91,"Rechazo HL":79.83,"OWD %":85.71,"On Time %":95.55,"Ef.Prev %":36.61,"5S Punt %":50,"Score Total":73.82,"Nivel":"Medio"},{"Semana":"Semana 3","Monitorista":"Nicol Baez","Estación":"E5","Liga":"Liga 2","Turno":"T1","Ef.Mod":73,"Rechazo HL":89.1,"OWD %":100.0,"On Time %":96.15,"Ef.Prev %":22.77,"5S Punt %":100,"Score Total":82.96,"Nivel":"Alto"},{"Semana":"Semana 3","Monitorista":"Paula Carriel","Estación":"E5","Liga":"Liga 2","Turno":"T2","Ef.Mod":73,"Rechazo HL":89.1,"OWD %":94.44,"On Time %":96.15,"Ef.Prev %":22.77,"5S Punt %":100,"Score Total":81.57,"Nivel":"Alto"},{"Semana":"Semana 3","Monitorista":"Keren Hallon","Estación":"E6","Liga":"Liga 3","Turno":"T1","Ef.Mod":80,"Rechazo HL":55.6,"OWD %":94.44,"On Time %":94.65,"Ef.Prev %":28.8,"5S Punt %":100,"Score Total":76.25,"Nivel":"Medio"},{"Semana":"Semana 3","Monitorista":"Estefania Perez","Estación":"E6","Liga":"Liga 3","Turno":"T2","Ef.Mod":80,"Rechazo HL":55.6,"OWD %":100.0,"On Time %":94.65,"Ef.Prev %":39.45,"5S Punt %":50,"Score Total":71.74,"Nivel":"Medio"},{"Semana":"Semana 3","Monitorista":"Nancy coronel","Estación":"E9","Liga":"Liga 1","Turno":"T1","Ef.Mod":91,"Rechazo HL":100.0,"OWD %":88.89,"On Time %":97.7,"Ef.Prev %":43.09,"5S Punt %":50,"Score Total":79.94,"Nivel":"Medio"},{"Semana":"Semana 3","Monitorista":"Alexis zuñiga","Estación":"E9","Liga":"Liga 1","Turno":"T2","Ef.Mod":91,"Rechazo HL":100.0,"OWD %":100.0,"On Time %":97.7,"Ef.Prev %":37.22,"5S Punt %":100,"Score Total":89.34,"Nivel":"Alto"},{"Semana":"Semana 3","Monitorista":"Gladys Ponce","Estación":"E7","Liga":"Liga 3","Turno":"T1","Ef.Mod":85,"Rechazo HL":89.45,"OWD %":94.44,"On Time %":70.34,"Ef.Prev %":35.44,"5S Punt %":50,"Score Total":73.37,"Nivel":"Medio"},{"Semana":"Semana 3","Monitorista":"Jorge Garzon","Estación":"E7","Liga":"Liga 3","Turno":"T2","Ef.Mod":85,"Rechazo HL":89.45,"OWD %":0.0,"On Time %":70.34,"Ef.Prev %":0.0,"5S Punt %":50,"Score Total":44.44,"Nivel":"Bajo"},{"Semana":"Semana 3","Monitorista":"Gina Ramos","Estación":"E8","Liga":"Liga 3","Turno":"T1","Ef.Mod":93,"Rechazo HL":100.0,"OWD %":100.0,"On Time %":99.45,"Ef.Prev %":35.24,"5S Punt %":50,"Score Total":82.0,"Nivel":"Alto"},{"Semana":"Semana 3","Monitorista":"Karen Toledo","Estación":"E8","Liga":"Liga 3","Turno":"T2","Ef.Mod":93,"Rechazo HL":100.0,"OWD %":94.44,"On Time %":99.45,"Ef.Prev %":36.34,"5S Punt %":100,"Score Total":88.28,"Nivel":"Alto"},{"Semana":"Semana 3","Monitorista":"Niurka Chenche","Estación":"E10","Liga":"Liga 1","Turno":"T1","Ef.Mod":90,"Rechazo HL":100.0,"OWD %":94.44,"On Time %":98.2,"Ef.Prev %":40.0,"5S Punt %":100,"Score Total":88.34,"Nivel":"Alto"},{"Semana":"Semana 3","Monitorista":"Kevin Araujo","Estación":"E10","Liga":"Liga 1","Turno":"T2","Ef.Mod":90,"Rechazo HL":100.0,"OWD %":94.44,"On Time %":98.2,"Ef.Prev %":27.0,"5S Punt %":50,"Score Total":78.89,"Nivel":"Medio"}];
+
+const SEMANAS=['Semana 1','Semana 2','Semana 3'];
+const KPIS=['Ef.Mod','Rechazo HL','OWD %','On Time %','Ef.Prev %','5S Punt %'];
+const PALETTE=['#f0a500','#3ecf8e','#58a6ff','#bc8cff','#f85149','#ffd700','#00bcd4','#ff7043','#ab47bc','#26a69a','#ef5350','#42a5f5','#66bb6a','#ffca28','#ec407a','#7e57c2','#29b6f6','#9ccc65','#ff7043','#26c6da','#d4e157'];
+let charts={}, activeSemana='Semana 1';
+const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
+const fmt=v=>typeof v==='number'?v.toFixed(1):v;
+const scColor=s=>s>=80?'var(--alto)':s>=60?'var(--medio)':'var(--bajo)';
+const badgeClass=n=>n==='Alto'?'badge-alto':n==='Bajo'?'badge-bajo':'badge-medio';
+function fd(sem='all',liga='all'){return DATA.filter(d=>(sem==='all'||d.Semana===sem)&&(liga==='all'||d.Liga===liga));}
+function getRank(sem,liga='all'){return fd(sem,liga).sort((a,b)=>b['Score Total']-a['Score Total']);}
+function getMons(liga='all'){
+  const mons=[...new Set(fd('all',liga).map(d=>d.Monitorista))];
+  return mons.map(m=>{
+    const rows=SEMANAS.map(s=>DATA.find(d=>d.Monitorista===m&&d.Semana===s)||null);
+    const scores=rows.map(r=>r?r['Score Total']:null);
+    const valid=scores.filter(s=>s!=null);
+    const meta=DATA.find(d=>d.Monitorista===m)||{};
+    return{mon:m,rows,scores,prom:avg(valid),estacion:meta['Estación'],liga:meta.Liga,turno:meta.Turno};
+  }).sort((a,b)=>b.prom-a.prom);
+}
+function dc(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+function pClass(i){return i===0?'p1':i===1?'p2':i===2?'p3':'pn';}
+function moveInd(pv,cu){
+  if(pv==null)return'<span class="move new">NEW</span>';
+  const d=pv-cu;if(d>0)return`<span class="move up">▲ ${d}</span>`;if(d<0)return`<span class="move down">▼ ${Math.abs(d)}</span>`;return'<span class="move same">—</span>';
+}
+function podium(top3,elId){
+  if(!top3||!top3.length){document.getElementById(elId).innerHTML='';return;}
+  const ord=[1,0,2],hs=['120px','160px','100px'],ns=['2°','1°','3°'],pc=['p2','p1','p3'];
+  let h='<div class="podium">';
+  ord.forEach((oi,di)=>{
+    const r=top3[oi];if(!r){h+='<div class="podium-item"></div>';return;}
+    const sc=(r['Score Total']||r.prom||0).toFixed(1);
+    h+=`<div class="podium-item"><div style="font-size:11px;color:var(--muted);margin-bottom:6px">${r['Estación']||r.estacion||''} · ${r.Liga||r.liga||''}</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:6px">${r.Monitorista||r.mon}</div><div class="podium-block ${pc[di]}" style="height:${hs[di]}"><div class="podium-num ${pc[di]}">${ns[di]}</div><div class="podium-score ${pc[di]}">${sc}</div></div></div>`;
+  });
+  document.getElementById(elId).innerHTML=h+'</div>';
+}
+function chartOpts(reverse=false,label=''){
+  return{responsive:true,maintainAspectRatio:true,
+    plugins:{legend:{display:false}},
+    scales:{
+      y:{...(reverse?{reverse:true,min:1}:{}),ticks:{color:'#8b949e',font:{family:'DM Mono',size:10}},grid:{color:'rgba(33,38,45,0.8)'}},
+      x:{ticks:{color:'#8b949e',font:{family:'DM Mono',size:10}},grid:{color:'rgba(33,38,45,0.8)'}}}};
+}
+
+// ===== RESUMEN =====
+function renderResumen(){
+  const sem=document.getElementById('f-sem-res').value;
+  const lig=document.getElementById('f-liga-res').value;
+  const d=fd(sem,lig);
+  const scores=d.map(r=>r['Score Total']),sa=avg(scores);
+  const alto=d.filter(r=>r.Nivel==='Alto').length,bajo=d.filter(r=>r.Nivel==='Bajo').length;
+  const top=d.sort((a,b)=>b['Score Total']-a['Score Total'])[0];
+  document.getElementById('kpi-res').innerHTML=`
+    <div class="kpi-card gold"><div class="kpi-label">Score Promedio</div><div class="kpi-value">${sa.toFixed(1)}</div><div class="kpi-sub">${d.length} registros</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Nivel Alto</div><div class="kpi-value">${alto}</div><div class="kpi-sub">${(alto/d.length*100).toFixed(0)}% del total</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Nivel Bajo</div><div class="kpi-value">${bajo}</div><div class="kpi-sub">${(bajo/d.length*100).toFixed(0)}% del total</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Mejor Score</div><div class="kpi-value">${top?top['Score Total'].toFixed(1):'—'}</div><div class="kpi-sub">${top?top.Monitorista:''}</div></div>`;
+  // charts
+  dc('r-sem');dc('r-niv');dc('r-liga');dc('r-kpi');dc('r-turno');
+  const semAvgs=SEMANAS.map(s=>{const sd=fd(s,lig);return sd.length?avg(sd.map(r=>r['Score Total'])):null;});
+  charts['r-sem']=new Chart(document.getElementById('ch-res-sem').getContext('2d'),{type:'line',data:{labels:SEMANAS,datasets:[{label:'Score',data:semAvgs,borderColor:'#f0a500',backgroundColor:'rgba(240,165,0,0.1)',borderWidth:2,pointBackgroundColor:'#f0a500',pointRadius:5,tension:0.3,fill:true}]},options:chartOpts()});
+  const niv=['Alto','Medio','Bajo'].map(n=>d.filter(r=>r.Nivel===n).length);
+  charts['r-niv']=new Chart(document.getElementById('ch-res-niv').getContext('2d'),{type:'doughnut',data:{labels:['Alto','Medio','Bajo'],datasets:[{data:niv,backgroundColor:['rgba(62,207,142,0.8)','rgba(240,165,0,0.8)','rgba(248,81,73,0.8)'],borderColor:['#3ecf8e','#f0a500','#f85149'],borderWidth:2}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#8b949e',font:{family:'DM Mono',size:11}}}}}});
+  const ligas=['Liga 1','Liga 2','Liga 3'],ls=ligas.map(l=>{const ld=fd(sem,l);return ld.length?avg(ld.map(r=>r['Score Total'])):0;});
+  charts['r-liga']=new Chart(document.getElementById('ch-res-liga').getContext('2d'),{type:'bar',data:{labels:ligas,datasets:[{data:ls,backgroundColor:['rgba(88,166,255,0.7)','rgba(188,140,255,0.7)','rgba(62,207,142,0.7)'],borderColor:['#58a6ff','#bc8cff','#3ecf8e'],borderWidth:2,borderRadius:6}]},options:chartOpts()});
+  const kpiAvgs=KPIS.map(k=>avg(d.map(r=>r[k])));
+  charts['r-kpi']=new Chart(document.getElementById('ch-res-kpi').getContext('2d'),{type:'bar',data:{labels:['Ef.Mod','Rec.HL','OWD','OnTime','EfPrev','5S'],datasets:[{data:kpiAvgs,backgroundColor:'rgba(240,165,0,0.6)',borderColor:'#f0a500',borderWidth:2,borderRadius:4}]},options:{...chartOpts(),indexAxis:'y'}});
+  const turnos=['T1','T2'],ts=turnos.map(t=>{const td=d.filter(r=>r.Turno===t);return td.length?avg(td.map(r=>r['Score Total'])):0;});
+  charts['r-turno']=new Chart(document.getElementById('ch-res-turno').getContext('2d'),{type:'bar',data:{labels:['Turno 1','Turno 2'],datasets:[{data:ts,backgroundColor:['rgba(62,207,142,0.7)','rgba(188,140,255,0.7)'],borderColor:['#3ecf8e','#bc8cff'],borderWidth:2,borderRadius:6}]},options:chartOpts()});
+}
+
+// ===== RANKING SEMANAL =====
+function renderRankingSemanal(){
+  const lig=document.getElementById('f-liga-sem').value;
+  document.getElementById('sem-lbl').textContent=activeSemana;
+  const curr=getRank(activeSemana,lig);
+  const semIdx=SEMANAS.indexOf(activeSemana);
+  const prev=semIdx>0?getRank(SEMANAS[semIdx-1],lig):null;
+  podium(curr.slice(0,3),'podium-sem');
+  const scores=curr.map(r=>r['Score Total']),alto=curr.filter(r=>r.Nivel==='Alto').length,bajo=curr.filter(r=>r.Nivel==='Bajo').length;
+  document.getElementById('kpi-sem').innerHTML=`
+    <div class="kpi-card gold"><div class="kpi-label">Score Promedio</div><div class="kpi-value">${avg(scores).toFixed(1)}</div><div class="kpi-sub">${activeSemana}</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Nivel Alto</div><div class="kpi-value">${alto}</div><div class="kpi-sub">${(alto/curr.length*100).toFixed(0)}%</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Nivel Bajo</div><div class="kpi-value">${bajo}</div><div class="kpi-sub">${(bajo/curr.length*100).toFixed(0)}%</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Máximo</div><div class="kpi-value">${curr[0]?curr[0]['Score Total'].toFixed(1):'—'}</div><div class="kpi-sub">${curr[0]?curr[0].Monitorista:''}</div></div>
+    <div class="kpi-card purple"><div class="kpi-label">Participantes</div><div class="kpi-value">${curr.length}</div><div class="kpi-sub">${lig==='all'?'Todas las ligas':lig}</div></div>`;
+  document.getElementById('body-sem').innerHTML=curr.map((r,i)=>{
+    const pv=prev?prev.findIndex(x=>x.Monitorista===r.Monitorista):null;
+    const mv=prev!==null?moveInd(pv,i):moveInd(null,i);
+    const sc=r['Score Total'];
+    return`<tr><td><span class="pos ${pClass(i)}">${i+1}</span></td><td>${mv}</td><td style="font-weight:600">${r.Monitorista}</td><td>${r['Estación']}</td><td>${r.Liga}</td><td>${r.Turno}</td><td>${fmt(r['Ef.Mod'])}</td><td>${fmt(r['Rechazo HL'])}</td><td>${fmt(r['OWD %'])}</td><td>${fmt(r['On Time %'])}</td><td>${fmt(r['Ef.Prev %'])}</td><td>${fmt(r['5S Punt %'])}</td><td><div class="sbar-wrap"><span style="font-family:'Syne',sans-serif;font-weight:700;color:${scColor(sc)};width:36px">${sc.toFixed(1)}</span><div class="sbar"><div class="sbar-fill" style="width:${sc}%;background:${scColor(sc)}"></div></div></div></td><td><span class="badge ${badgeClass(r.Nivel)}">${r.Nivel}</span></td></tr>`;
+  }).join('');
+  dc('pos-lines');
+  const allM=[...new Set(DATA.filter(d=>lig==='all'||d.Liga===lig).map(d=>d.Monitorista))];
+  const sRanks=SEMANAS.map(s=>getRank(s,lig));
+  charts['pos-lines']=new Chart(document.getElementById('ch-pos-lines').getContext('2d'),{type:'line',data:{labels:['S1','S2','S3'],datasets:allM.map((m,mi)=>({label:m,data:sRanks.map(sr=>{const idx=sr.findIndex(r=>r.Monitorista===m);return idx>=0?idx+1:null;}),borderColor:PALETTE[mi%PALETTE.length],backgroundColor:'transparent',borderWidth:2,pointRadius:5,tension:0.3,spanGaps:true}))},options:{responsive:true,maintainAspectRatio:true,scales:{y:{reverse:true,min:1,ticks:{stepSize:1,color:'#8b949e',font:{family:'DM Mono',size:10}},grid:{color:'rgba(33,38,45,0.8)'},title:{display:true,text:'Posición',color:'#8b949e',font:{size:10}}},x:{ticks:{color:'#8b949e',font:{family:'DM Mono',size:11}},grid:{color:'rgba(33,38,45,0.8)'}}},plugins:{legend:{display:true,position:'right',labels:{color:'#8b949e',font:{family:'DM Mono',size:9},boxWidth:12,padding:5}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: #${c.raw}`}}}}});
+}
+
+// ===== RANKING MENSUAL =====
+function renderRankingMensual(){
+  const lig=document.getElementById('f-liga-mes').value;
+  const md=getMons(lig);
+  podium(md.slice(0,3).map(m=>({Monitorista:m.mon,'Score Total':m.prom,'Estación':m.estacion,Liga:m.liga})),'podium-mes');
+  const s1a=avg(fd('Semana 1',lig).map(r=>r['Score Total'])),s3a=avg(fd('Semana 3',lig).map(r=>r['Score Total']));
+  const td=s3a-s1a;
+  document.getElementById('kpi-mes').innerHTML=`
+    <div class="kpi-card gold"><div class="kpi-label">Prom. Mensual</div><div class="kpi-value">${avg(md.map(m=>m.prom)).toFixed(1)}</div><div class="kpi-sub">Marzo — 3 semanas</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Score ≥ 80</div><div class="kpi-value">${md.filter(m=>m.prom>=80).length}</div><div class="kpi-sub">monitoristas</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Score < 60</div><div class="kpi-value">${md.filter(m=>m.prom<60).length}</div><div class="kpi-sub">monitoristas</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Líder Mensual</div><div class="kpi-value">${md[0]?md[0].prom.toFixed(1):'—'}</div><div class="kpi-sub">${md[0]?md[0].mon:''}</div></div>
+    <div class="kpi-card ${td>=0?'green':'red'}"><div class="kpi-label">Δ S1→S3</div><div class="kpi-value">${td>=0?'+':''}${td.toFixed(1)}</div><div class="kpi-sub">${td>=0?'Mejora':'Caída'} acumulada</div></div>`;
+  document.getElementById('body-mes').innerHTML=md.map((m,i)=>{
+    const [s1,s2,s3]=m.scores;
+    const dtot=s1!=null&&s3!=null?s3-s1:null;
+    const fD=d=>d!=null?(d>=0?`<span style="color:var(--alto)">+${d.toFixed(1)}</span>`:`<span style="color:var(--red)">${d.toFixed(1)}</span>`):'—';
+    const valid=m.scores.filter(s=>s!=null),mx=Math.max(...valid,1);
+    const spark=m.scores.map((s,si)=>{if(s==null)return`<div class="spark-bar" style="height:4px;background:var(--border)"></div>`;return`<div class="spark-bar" style="height:${Math.round((s/mx)*24)}px;background:${scColor(s)}" title="S${si+1}: ${s.toFixed(1)}"></div>`;}).join('');
+    const nivs=SEMANAS.map((_,si)=>{const r=DATA.find(d=>d.Monitorista===m.mon&&d.Semana===SEMANAS[si]);return r?r.Nivel:null;}).filter(Boolean);
+    const bn=nivs.includes('Alto')?'Alto':nivs.includes('Medio')?'Medio':'Bajo';
+    return`<tr><td><span class="pos ${pClass(i)}">${i+1}</span></td><td style="font-weight:600">${m.mon}</td><td>${m.estacion||'—'}</td><td>${m.liga||'—'}</td><td>${m.turno||'—'}</td><td style="color:${s1!=null?scColor(s1):'var(--muted)'}">${s1!=null?s1.toFixed(1):'—'}</td><td style="color:${s2!=null?scColor(s2):'var(--muted)'}">${s2!=null?s2.toFixed(1):'—'}</td><td style="color:${s3!=null?scColor(s3):'var(--muted)'}">${s3!=null?s3.toFixed(1):'—'}</td><td>${fD(dtot)}</td><td><div class="sbar-wrap"><span style="font-family:'Syne',sans-serif;font-weight:700;color:${scColor(m.prom)};width:36px">${m.prom.toFixed(1)}</span><div class="sbar"><div class="sbar-fill" style="width:${m.prom}%;background:${scColor(m.prom)}"></div></div></div></td><td><div class="spark">${spark}</div></td><td><span class="badge ${badgeClass(bn)}">${bn}</span></td></tr>`;
+  }).join('');
+  dc('mes-bar');dc('mes-niv');
+  const top10=md.slice(0,10);
+  charts['mes-bar']=new Chart(document.getElementById('ch-mes-bar').getContext('2d'),{type:'bar',data:{labels:top10.map(m=>m.mon.split(' ')[0]),datasets:[{data:top10.map(m=>m.prom),backgroundColor:top10.map(m=>m.prom>=80?'rgba(62,207,142,0.7)':m.prom>=60?'rgba(240,165,0,0.7)':'rgba(248,81,73,0.7)'),borderWidth:0,borderRadius:5}]},options:{...chartOpts(),indexAxis:'y',scales:{x:{min:30,max:100,ticks:{color:'#8b949e',font:{family:'DM Mono',size:10}},grid:{color:'rgba(33,38,45,0.8)'}},y:{ticks:{color:'#8b949e',font:{family:'DM Mono',size:10}},grid:{color:'rgba(33,38,45,0.8)'}}}}}); 
+  charts['mes-niv']=new Chart(document.getElementById('ch-mes-niv').getContext('2d'),{type:'bar',data:{labels:['S1','S2','S3'],datasets:[{label:'Alto',data:SEMANAS.map(s=>fd(s,lig).filter(r=>r.Nivel==='Alto').length),backgroundColor:'rgba(62,207,142,0.7)',borderWidth:0,borderRadius:4},{label:'Medio',data:SEMANAS.map(s=>fd(s,lig).filter(r=>r.Nivel==='Medio').length),backgroundColor:'rgba(240,165,0,0.7)',borderWidth:0,borderRadius:4},{label:'Bajo',data:SEMANAS.map(s=>fd(s,lig).filter(r=>r.Nivel==='Bajo').length),backgroundColor:'rgba(248,81,73,0.7)',borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{labels:{color:'#8b949e',font:{family:'DM Mono',size:10}}}},scales:{x:{stacked:true,ticks:{color:'#8b949e',font:{family:'DM Mono',size:10}},grid:{color:'rgba(33,38,45,0.8)'}},y:{stacked:true,ticks:{color:'#8b949e',font:{family:'DM Mono',size:10}},grid:{color:'rgba(33,38,45,0.8)'}}}}});
+}
+
+// ===== EVOLUCIÓN =====
+function populateMonSel(){
+  const lig=document.getElementById('f-liga-evo').value;
+  const mons=[...new Set(fd('all',lig).map(d=>d.Monitorista))].sort();
+  const sel=document.getElementById('sel-mon'),cur=sel.value;
+  sel.innerHTML=mons.map(m=>`<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
+  renderEvolucion();
+}
+function renderEvolucion(){
+  const mon=document.getElementById('sel-mon').value;
+  const rows=SEMANAS.map(s=>DATA.find(d=>d.Monitorista===mon&&d.Semana===s)||null);
+  const valid=rows.filter(r=>r);
+  if(!valid.length){document.getElementById('evo-detail').innerHTML='<p style="color:var(--muted);padding:20px">Sin datos</p>';return;}
+  const scores=rows.map(r=>r?r['Score Total']:null);
+  const vScores=scores.filter(s=>s!=null);
+  const prom=avg(vScores),delta=vScores.length>1?vScores[vScores.length-1]-vScores[0]:0;
+  const r0=valid[0];
+  const positions=SEMANAS.map(s=>{const sr=getRank(s,'all');const idx=sr.findIndex(r=>r.Monitorista===mon);return idx>=0?idx+1:null;});
+  document.getElementById('evo-detail').innerHTML=`
+    <div class="rank-wrap" style="padding:20px;margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
+        <div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:22px">${mon}</div>
+          <div style="color:var(--muted);font-size:11px;margin-top:4px">${r0['Estación']} · ${r0.Liga} · Turno ${r0.Turno}</div></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          ${rows.map((r,i)=>r?`<div style="text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;"><div style="color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase">${SEMANAS[i].replace('Semana','S')}</div><div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:${scColor(r['Score Total'])}">${r['Score Total'].toFixed(1)}</div><div style="font-size:10px;color:var(--muted)">Pos. #${positions[i]||'—'}</div><div style="margin-top:4px"><span class="badge ${badgeClass(r.Nivel)}">${r.Nivel}</span></div></div>`:'').join('')}
+          <div style="text-align:center;background:rgba(240,165,0,0.08);border:1px solid rgba(240,165,0,0.25);border-radius:10px;padding:12px 16px;"><div style="color:var(--accent);font-size:10px;letter-spacing:1px;text-transform:uppercase">Promedio</div><div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:${scColor(prom)}">${prom.toFixed(1)}</div><div style="font-size:12px;margin-top:4px;color:${delta>=0?'var(--alto)':'var(--red)'};font-family:'Syne',sans-serif;font-weight:700">${delta>=0?'▲ +':'▼ '}${delta.toFixed(1)}</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="chart-card"><div class="section-title">Evolución del Score</div><canvas id="ch-evo-sc"></canvas></div>
+      <div class="chart-card"><div class="section-title">Posición en Ranking</div><canvas id="ch-evo-pos"></canvas></div>
+    </div>
+    <div class="section-title">Detalle KPIs por Semana</div>
+    <div class="rank-wrap"><table><thead><tr><th>Semana</th><th>Pos.</th><th>Ef.Mod</th><th>Rechazo HL</th><th>OWD %</th><th>On Time %</th><th>Ef.Prev %</th><th>5S %</th><th>Score</th><th>Nivel</th></tr></thead>
+    <tbody>${rows.map((r,i)=>r?`<tr><td style="font-weight:600">${SEMANAS[i]}</td><td><span class="pos ${pClass((positions[i]||99)-1)}">#${positions[i]||'—'}</span></td><td>${fmt(r['Ef.Mod'])}</td><td>${fmt(r['Rechazo HL'])}</td><td>${fmt(r['OWD %'])}</td><td>${fmt(r['On Time %'])}</td><td>${fmt(r['Ef.Prev %'])}</td><td>${fmt(r['5S Punt %'])}</td><td style="font-family:'Syne',sans-serif;font-weight:700;color:${scColor(r['Score Total'])}">${r['Score Total'].toFixed(1)}</td><td><span class="badge ${badgeClass(r.Nivel)}">${r.Nivel}</span></td></tr>`:'').join('')}</tbody></table></div>`;
+  dc('evo-sc');dc('evo-pos');
+  charts['evo-sc']=new Chart(document.getElementById('ch-evo-sc').getContext('2d'),{type:'line',data:{labels:['S1','S2','S3'],datasets:[{label:'Score',data:scores,borderColor:'#f0a500',backgroundColor:'rgba(240,165,0,0.1)',borderWidth:3,pointBackgroundColor:scores.map(s=>s!=null?scColor(s):'transparent'),pointRadius:7,tension:0.3,fill:true,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{color:'#8b949e',font:{family:'DM Mono',size:10}},grid:{color:'rgba(33,38,45,0.8)'}},x:{ticks:{color:'#8b949e',font:{family:'DM Mono',size:10}},grid:{color:'rgba(33,38,45,0.8)'}}}}});
+  charts['evo-pos']=new Chart(document.getElementById('ch-evo-pos').getContext('2d'),{type:'line',data:{labels:['S1','S2','S3'],datasets:[{label:'Posición',data:positions,borderColor:'#3ecf8e',backgroundColor:'rgba(62,207,142,0.1)',borderWidth:3,pointBackgroundColor:'#3ecf8e',pointRadius:7,tension:0.3,fill:true,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Posición: #${c.raw}`}}},scales:{y:{reverse:true,min:1,ticks:{stepSize:1,color:'#8b949e',font:{family:'DM Mono',size:10}},grid:{color:'rgba(33,38,45,0.8)'},title:{display:true,text:'Posición',color:'#8b949e'}},x:{ticks:{color:'#8b949e',font:{family:'DM Mono',size:10}},grid:{color:'rgba(33,38,45,0.8)'}}}}});
+}
+
+// ===== COMPARATIVO =====
+function renderComparativo(){
+  const lig=document.getElementById('f-liga-comp').value;
+  const md=getMons(lig);
+  const s1a=avg(fd('Semana 1',lig).map(r=>r['Score Total'])),s2a=avg(fd('Semana 2',lig).map(r=>r['Score Total'])),s3a=avg(fd('Semana 3',lig).map(r=>r['Score Total']));
+  const td=s3a-s1a;
+  const bi=md.filter(m=>m.scores[0]&&m.scores[2]).sort((a,b)=>(b.scores[2]-b.scores[0])-(a.scores[2]-a.scores[0]))[0];
+  document.getElementById('kpi-comp').innerHTML=`
+    <div class="kpi-card gold"><div class="kpi-label">Prom. Semana 1</div><div class="kpi-value">${s1a.toFixed(1)}</div><div class="kpi-sub">Línea base</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Prom. Semana 2</div><div class="kpi-value">${s2a.toFixed(1)}</div><div class="kpi-sub">${(s2a-s1a)>=0?'▲ +':'▼ '}${(s2a-s1a).toFixed(1)} vs S1</div></div>
+    <div class="kpi-card purple"><div class="kpi-label">Prom. Semana 3</div><div class="kpi-value">${s3a.toFixed(1)}</div><div class="kpi-sub">${(s3a-s2a)>=0?'▲ +':'▼ '}${(s3a-s2a).toFixed(1)} vs S2</div></div>
+    <div class="kpi-card ${td>=0?'green':'red'}"><div class="kpi-label">Δ Total S1→S3</div><div class="kpi-value">${td>=0?'+':''}${td.toFixed(1)}</div><div class="kpi-sub">${td>=0?'Mejora':'Caída'}</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Mayor Mejora</div><div class="kpi-value" style="font-size:16px">${bi?'+'+(bi.scores[2]-bi.scores[0]).toFixed(1):'—'}</div><div class="kpi-sub">${bi?bi.mon:''}</div></div>`;
+  document.getElementById('body-comp').innerHTML=md.map(m=>{
+    const [s1,s2,s3]=m.scores;
+    const d12=s1!=null&&s2!=null?s2-s1:null,d23=s2!=null&&s3!=null?s3-s2:null,dtot=s1!=null&&s3!=null?s3-s1:null;
+    const fD=d=>d!=null?(d>=0?`<span style="color:var(--alto)">+${d.toFixed(1)}</span>`:`<span style="color:var(--red)">${d.toFixed(1)}</span>`):'—';
+    const valid=m.scores.filter(s=>s!=null),mx=Math.max(...valid,1);
+    const spark=m.scores.map((s,si)=>{if(s==null)return`<div class="spark-bar" style="height:4px;background:var(--border)"></div>`;return`<div class="spark-bar" style="height:${Math.round((s/mx)*24)}px;background:${scColor(s)}" title="S${si+1}: ${s.toFixed(1)}"></div>`;}).join('');
+    return`<tr><td style="font-weight:600">${m.mon}</td><td>${m.estacion||'—'}</td><td>${m.liga||'—'}</td><td style="color:${s1!=null?scColor(s1):'var(--muted)'}">${s1!=null?s1.toFixed(1):'—'}</td><td style="color:${s2!=null?scColor(s2):'var(--muted)'}">${s2!=null?s2.toFixed(1):'—'}</td><td style="color:${s3!=null?scColor(s3):'var(--muted)'}">${s3!=null?s3.toFixed(1):'—'}</td><td>${fD(d12)}</td><td>${fD(d23)}</td><td>${fD(dtot)}</td><td style="font-family:'Syne',sans-serif;font-weight:700;color:${scColor(m.prom)}">${m.prom.toFixed(1)}</td><td><div class="spark">${spark}</div></td></tr>`;
+  }).join('');
+  dc('comp-lines');
+  const allM=[...new Set(fd('all',lig).map(d=>d.Monitorista))];
+  charts['comp-lines']=new Chart(document.getElementById('ch-comp-lines').getContext('2d'),{type:'line',data:{labels:['S1','S2','S3'],datasets:allM.map((m,mi)=>({label:m,data:SEMANAS.map(s=>{const r=DATA.find(d=>d.Monitorista===m&&d.Semana===s);return r?r['Score Total']:null;}),borderColor:PALETTE[mi%PALETTE.length],backgroundColor:'transparent',borderWidth:2,pointRadius:4,tension:0.3,spanGaps:true})).concat([{label:'— Promedio',data:[s1a,s2a,s3a],borderColor:'#fff',backgroundColor:'transparent',borderWidth:3,borderDash:[6,4],pointRadius:6,tension:0.3,order:-1}])},options:{responsive:true,maintainAspectRatio:true,scales:{y:{min:30,max:100,ticks:{color:'#8b949e',font:{family:'DM Mono',size:10}},grid:{color:'rgba(33,38,45,0.8)'}},x:{ticks:{color:'#8b949e',font:{family:'DM Mono',size:10}},grid:{color:'rgba(33,38,45,0.8)'}}},plugins:{legend:{display:true,position:'right',labels:{color:'#8b949e',font:{family:'DM Mono',size:9},boxWidth:12,padding:5}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.raw!=null?c.raw.toFixed(1):'—'}`}}}}});
+}
+
+// ===== HEATMAP =====
+function renderHeatmap(){
+  const sem=document.getElementById('f-sem-hm').value;
+  const lig=document.getElementById('f-liga-hm').value;
+  const d=fd(sem,lig);
+  const mons=[...new Set(d.map(x=>x.Monitorista))].sort();
+  const container=document.getElementById('hm-grid');
+  const cols=KPIS.length;
+  container.style.cssText=`display:grid;grid-template-columns:160px repeat(${cols},1fr);gap:4px;`;
+  function hmColor(v){
+    const r=v<50?248:Math.round(248-(v-50)*3.8);
+    const g=v>50?207:Math.round((v/50)*165);
+    const b=v<50?73:50;
+    return`rgba(${r},${g},${b},0.4)`;
+  }
+  let html=`<div class="hm-header-cell"></div>`;
+  KPIS.forEach(k=>{html+=`<div class="hm-header-cell">${k}</div>`;});
+  mons.forEach(m=>{
+    const rows=d.filter(x=>x.Monitorista===m);
+    html+=`<div class="hm-name-cell">${m}</div>`;
+    KPIS.forEach(k=>{
+      const vals=rows.map(x=>x[k]).filter(v=>v!=null);
+      const v=vals.length?avg(vals):0;
+      html+=`<div class="hm-cell" style="background:${hmColor(v)}" title="${m} — ${k}: ${v.toFixed(1)}">${v.toFixed(0)}</div>`;
+    });
+  });
+  container.innerHTML=html;
+}
+
+// ===== TABS & INIT =====
+function showTab(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');el.classList.add('active');
+  if(id==='resumen')renderResumen();
+  else if(id==='ranking-sem')renderRankingSemanal();
+  else if(id==='ranking-mes')renderRankingMensual();
+  else if(id==='evolucion')renderEvolucion();
+  else if(id==='comparativo')renderComparativo();
+  else if(id==='heatmap')renderHeatmap();
+}
+function initPills(){
+  document.getElementById('pills-sem').innerHTML=SEMANAS.map((s,i)=>`<div class="pill ${i===0?'active':''}" onclick="setSemana('${s}',this)">${s}</div>`).join('');
+}
+function setSemana(s,el){activeSemana=s;document.querySelectorAll('#pills-sem .pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');renderRankingSemanal();}
+document.addEventListener('DOMContentLoaded',()=>{initPills();populateMonSel();renderResumen();});
+</script>
+</body>
+</html>
